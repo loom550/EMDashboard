@@ -606,9 +606,9 @@ function renderHubs(hubs) {
   hubs = hubs.filter(hub => hub.name !== "Main EOC");
   
   const hubsHTML = hubs.map(hub => {
-    const occupancyRate = hub.capacity > 0 
-      ? Math.round((hub.evacuees / hub.capacity) * 100) 
-      : 0;
+    const occupancyRate = hub.rooms > 0 
+  ? Math.round((hub.occupied / hub.rooms) * 100) 
+  : 0;
 
     return `
       <div class="hub-card">
