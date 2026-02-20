@@ -554,14 +554,10 @@ async function fetchData() {
 }
 // Render summary cards
 function renderSummary(data, hubs) {
-  // Calculate total capacity by summing all hub capacities
-  const totalCapacity = hubs
+  // Calculate available capacity by summing all hub capacities (already vacant × 2.5)
+  const availableCapacity = hubs
     .filter(hub => hub.name !== "Main EOC")
     .reduce((sum, hub) => sum + hub.capacity, 0);
-  
-  const occupancyRate = totalCapacity > 0 
-    ? Math.round((data.totalEvacuees / totalCapacity) * 100) 
-    : 0;
 
   const summaryHTML = `
     <div class="summary-card" style="border-left-color: var(--teal-500)">
@@ -577,7 +573,12 @@ function renderSummary(data, hubs) {
     <div class="summary-card" style="border-left-color: var(--lime-500)">
       <div class="card-label">Current Occupancy</div>
       <div class="card-value">${data.totalEvacuees}</div>
-      <div class="card-context">of ${Math.round(totalCapacity)} capacity (${occupancyRate}%)</div>
+      <div class="card-context">evacuees sheltered</div>
+    </div>
+    <div class="summary-card" style="border-left-color: var(--navy-600)">
+      <div class="card-label">Available Capacity</div>
+      <div class="card-value">${Math.round(availableCapacity)}</div>
+      <div class="card-context">can shelter more</div>
     </div>
     <div class="summary-card" style="border-left-color: var(--red-500)">
       <div class="card-label">Open IMS 213s</div>
@@ -598,7 +599,7 @@ function renderSummary(data, hubs) {
 
   document.getElementById('summaryGrid').innerHTML = summaryHTML;
 }
-
+    
 // Render hub cards
 function renderHubs(hubs) {
   // Filter out Main EOC
