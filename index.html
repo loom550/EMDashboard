@@ -552,10 +552,15 @@ async function fetchData() {
     throw error; // Re-throw the error instead of returning mock data
   }
 }
-    // Render summary cards
-function renderSummary(data) {
-  const occupancyRate = data.capacity > 0 
-    ? Math.round((data.totalEvacuees / data.capacity) * 100) 
+// Render summary cards
+function renderSummary(data, hubs) {
+  // Calculate total capacity by summing all hub capacities
+  const totalCapacity = hubs
+    .filter(hub => hub.name !== "Main EOC")
+    .reduce((sum, hub) => sum + hub.capacity, 0);
+  
+  const occupancyRate = totalCapacity > 0 
+    ? Math.round((data.totalEvacuees / totalCapacity) * 100) 
     : 0;
 
   const summaryHTML = `
@@ -572,7 +577,7 @@ function renderSummary(data) {
     <div class="summary-card" style="border-left-color: var(--lime-500)">
       <div class="card-label">Current Occupancy</div>
       <div class="card-value">${data.totalEvacuees}</div>
-      <div class="card-context">of ${data.capacity} capacity (${occupancyRate}%)</div>
+      <div class="card-context">of ${Math.round(totalCapacity)} capacity (${occupancyRate}%)</div>
     </div>
     <div class="summary-card" style="border-left-color: var(--red-500)">
       <div class="card-label">Open IMS 213s</div>
@@ -658,11 +663,12 @@ function renderHubs(hubs) {
 }
 
     // Initialize dashboard
-    async function initDashboard() {
-      const data = await fetchData();
-      renderSummary(data.summary);
-      renderHubs(data.hubs);
-    }
+async function initDashboard() {
+  const data = await fetchData();
+  const filteredHubs = data.hubs.filter(hub => hub.name !== "Main EOC");
+  renderSummary(data.summary, data.hubs);
+  renderHubs(filteredHubs);
+}
 
     // Load dashboard on page load
     window.addEventListener('DOMContentLoaded', initDashboard);
