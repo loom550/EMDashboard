@@ -589,106 +589,109 @@ async function fetchData() {
   }
 }
     // Render summary cards
-    function renderSummary(data) {
-      const occupancyRate = data.capacity > 0 
-        ? Math.round((data.totalEvacuees / data.capacity) * 100) 
-        : 0;
+function renderSummary(data) {
+  const occupancyRate = data.capacity > 0 
+    ? Math.round((data.totalEvacuees / data.capacity) * 100) 
+    : 0;
 
-      const summaryHTML = `
-        <div class="summary-card" style="border-left-color: var(--teal-500)">
-          <div class="card-label">Active Hubs</div>
-          <div class="card-value">${data.totalHubs}</div>
-          <div class="card-context">operational sites</div>
-        </div>
-        <div class="summary-card" style="border-left-color: var(--navy-600)">
-          <div class="card-label">Total Rooms</div>
-          <div class="card-value">${data.totalRooms}</div>
-          <div class="card-context">${data.occupied} occupied, ${data.vacant} vacant</div>
-        </div>
-        <div class="summary-card" style="border-left-color: var(--lime-500)">
-          <div class="card-label">Current Occupancy</div>
-          <div class="card-value">${data.totalEvacuees}</div>
-          <div class="card-context">of ${data.capacity} capacity (${occupancyRate}%)</div>
-        </div>
-        <div class="summary-card" style="border-left-color: var(--red-500)">
-          <div class="card-label">Open ICS 213s</div>
-          <div class="card-value">${data.open213s}</div>
-          <div class="card-context">messages pending</div>
-        </div>
-        <div class="summary-card" style="border-left-color: var(--amber-500)">
-          <div class="card-label">Pending Transfers</div>
-          <div class="card-value">${data.pendingTransfers}</div>
-          <div class="card-context">${data.activeTransfers} in progress</div>
-        </div>
-        <div class="summary-card" style="border-left-color: var(--teal-500)">
-          <div class="card-label">Completed Today</div>
-          <div class="card-value">${data.completedToday}</div>
-          <div class="card-context">transfers finalized</div>
-        </div>
-      `;
+  const summaryHTML = `
+    <div class="summary-card" style="border-left-color: var(--teal-500)">
+      <div class="card-label">Active Hubs</div>
+      <div class="card-value">${data.totalHubs}</div>
+      <div class="card-context">operational sites</div>
+    </div>
+    <div class="summary-card" style="border-left-color: var(--navy-600)">
+      <div class="card-label">Total Rooms</div>
+      <div class="card-value">${data.totalRooms}</div>
+      <div class="card-context">${data.occupied} occupied, ${data.vacant} vacant</div>
+    </div>
+    <div class="summary-card" style="border-left-color: var(--lime-500)">
+      <div class="card-label">Current Occupancy</div>
+      <div class="card-value">${data.totalEvacuees}</div>
+      <div class="card-context">of ${data.capacity} capacity (${occupancyRate}%)</div>
+    </div>
+    <div class="summary-card" style="border-left-color: var(--red-500)">
+      <div class="card-label">Open IMS 213s</div>
+      <div class="card-value">${data.open213s}</div>
+      <div class="card-context">messages pending</div>
+    </div>
+    <div class="summary-card" style="border-left-color: var(--amber-500)">
+      <div class="card-label">Pending Transfers</div>
+      <div class="card-value">${data.pendingTransfers}</div>
+      <div class="card-context">${data.activeTransfers} in progress</div>
+    </div>
+    <div class="summary-card" style="border-left-color: var(--teal-500)">
+      <div class="card-label">Completed Today</div>
+      <div class="card-value">${data.completedToday}</div>
+      <div class="card-context">transfers finalized</div>
+    </div>
+  `;
 
-      document.getElementById('summaryGrid').innerHTML = summaryHTML;
-    }
+  document.getElementById('summaryGrid').innerHTML = summaryHTML;
+}
 
-    // Render hub cards
-    function renderHubs(hubs) {
-      const hubsHTML = hubs.map(hub => {
-        const occupancyRate = hub.capacity > 0 
-          ? Math.round((hub.evacuees / hub.capacity) * 100) 
-          : 0;
+// Render hub cards
+function renderHubs(hubs) {
+  // Filter out Main EOC
+  hubs = hubs.filter(hub => hub.name !== "Main EOC");
+  
+  const hubsHTML = hubs.map(hub => {
+    const occupancyRate = hub.capacity > 0 
+      ? Math.round((hub.evacuees / hub.capacity) * 100) 
+      : 0;
 
-        return `
-          <div class="hub-card">
-            <div class="hub-header">
-              <div class="hub-name">${hub.name}</div>
-              <div class="hub-status">${hub.status}</div>
-            </div>
-            <div class="hub-metrics">
-              <div class="hub-metric">
-                <div class="metric-label">Total Rooms</div>
-                <div class="metric-value">${hub.rooms}</div>
-              </div>
-              <div class="hub-metric">
-                <div class="metric-label">Occupied</div>
-                <div class="metric-value">${hub.occupied}</div>
-                <div class="metric-sub">rooms in use</div>
-              </div>
-              <div class="hub-metric">
-                <div class="metric-label">Vacant</div>
-                <div class="metric-value">${hub.vacant}</div>
-                <div class="metric-sub">available</div>
-              </div>
-              <div class="hub-metric">
-                <div class="metric-label">Evacuees</div>
-                <div class="metric-value">${hub.evacuees}</div>
-                <div class="metric-sub">current</div>
-              </div>
-              <div class="hub-metric">
-                <div class="metric-label">Capacity</div>
-                <div class="metric-value">${hub.capacity}</div>
-                <div class="metric-sub">max (2.5x)</div>
-              </div>
-              <div class="hub-metric">
-                <div class="metric-label">Utilization</div>
-                <div class="metric-value">${occupancyRate}%</div>
-                <div class="metric-sub">occupied</div>
-              </div>
-            </div>
-            <div class="occupancy-bar">
-              <div class="bar-label">
-                <span>Occupancy Rate</span>
-                <span class="bar-percentage">${occupancyRate}%</span>
-              </div>
-              <div class="bar-track">
-                <div class="bar-fill" style="width: ${occupancyRate}%"></div>
-              </div>
-            </div>
+    return `
+      <div class="hub-card">
+        <div class="hub-header">
+          <div class="hub-name">${hub.name}</div>
+          <div class="hub-status">${hub.status}</div>
+        </div>
+        <div class="hub-metrics">
+          <div class="hub-metric">
+            <div class="metric-label">Total Rooms</div>
+            <div class="metric-value">${hub.rooms}</div>
           </div>
-        `;
-      }).join('');
+          <div class="hub-metric">
+            <div class="metric-label">Occupied</div>
+            <div class="metric-value">${hub.occupied}</div>
+            <div class="metric-sub">rooms in use</div>
+          </div>
+          <div class="hub-metric">
+            <div class="metric-label">Vacant</div>
+            <div class="metric-value">${hub.vacant}</div>
+            <div class="metric-sub">available</div>
+          </div>
+          <div class="hub-metric">
+            <div class="metric-label">Evacuees</div>
+            <div class="metric-value">${hub.evacuees}</div>
+            <div class="metric-sub">current</div>
+          </div>
+          <div class="hub-metric">
+            <div class="metric-label">Capacity</div>
+            <div class="metric-value">${hub.capacity}</div>
+            <div class="metric-sub">max (2.5x)</div>
+          </div>
+          <div class="hub-metric">
+            <div class="metric-label">Utilization</div>
+            <div class="metric-value">${occupancyRate}%</div>
+            <div class="metric-sub">occupied</div>
+          </div>
+        </div>
+        <div class="occupancy-bar">
+          <div class="bar-label">
+            <span>Occupancy Rate</span>
+            <span class="bar-percentage">${occupancyRate}%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: ${occupancyRate}%"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 
-      document.getElementById('hubsGrid').innerHTML = hubsHTML;
-    }
+  document.getElementById('hubsGrid').innerHTML = hubsHTML;
+}
 
     // Initialize dashboard
     async function initDashboard() {
