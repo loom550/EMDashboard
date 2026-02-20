@@ -521,6 +521,7 @@
     setInterval(updateTimestamp, 1000);
 
     // Fetch data from Power Automate
+// Fetch data from Power Automate
 async function fetchData() {
   const FLOW_URL = 'https://defaultf37e3a4c5aaa4bf993d2cc21b157eb.4c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/49779f52c7ce4b1cac7d0d3bdd2a71e7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ym6PDiJax2F_Kcf87lUZmFPLQt-n4p0atqwPq2YSbys';
   
@@ -534,7 +535,6 @@ async function fetchData() {
     });
     
     console.log('Response status:', response.status);
-    console.log('Response headers:', response.headers);
     
     const text = await response.text();
     console.log('Raw response:', text);
@@ -549,43 +549,7 @@ async function fetchData() {
   } catch (error) {
     console.error('FULL ERROR:', error);
     console.error('Error details:', error.message);
-    
-    // Return mock data
-    console.log('Using mock data instead');
-    return {
-      summary: {
-        totalHubs: 2,
-        totalRooms: 10,
-        occupied: 4,
-        vacant: 6,
-        totalEvacuees: 3,
-        capacity: 25,
-        open213s: 2,
-        pendingTransfers: 3,
-        activeTransfers: 1,
-        completedToday: 5
-      },
-      hubs: [
-        {
-          name: "Kingston",
-          status: "Active",
-          rooms: 8,
-          occupied: 3,
-          vacant: 5,
-          evacuees: 2,
-          capacity: 20
-        },
-        {
-          name: "Kingston West",
-          status: "Active",
-          rooms: 2,
-          occupied: 1,
-          vacant: 1,
-          evacuees: 1,
-          capacity: 5
-        }
-      ]
-    };
+    throw error; // Re-throw the error instead of returning mock data
   }
 }
     // Render summary cards
