@@ -525,6 +525,7 @@ async function fetchData() {
   const FLOW_URL = 'https://defaultf37e3a4c5aaa4bf993d2cc21b157eb.4c.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/49779f52c7ce4b1cac7d0d3bdd2a71e7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ym6PDiJax2F_Kcf87lUZmFPLQt-n4p0atqwPq2YSbys';
   
   try {
+    console.log('Calling Power Automate flow...');
     const response = await fetch(FLOW_URL, {
       method: 'POST',
       headers: {
@@ -532,17 +533,25 @@ async function fetchData() {
       }
     });
     
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+    
+    const text = await response.text();
+    console.log('Raw response:', text);
+    
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
     }
     
-    const data = await response.json();
-    console.log('Flow data:', data);
+    const data = JSON.parse(text);
+    console.log('Parsed data:', data);
     return data;
   } catch (error) {
-    console.error('Error fetching data:', error);
-    alert('Could not fetch data from Power Automate. Check console for details.');
-    // Return mock data as fallback
+    console.error('FULL ERROR:', error);
+    console.error('Error details:', error.message);
+    
+    // Return mock data
+    console.log('Using mock data instead');
     return {
       summary: {
         totalHubs: 2,
@@ -565,6 +574,15 @@ async function fetchData() {
           vacant: 5,
           evacuees: 2,
           capacity: 20
+        },
+        {
+          name: "Kingston West",
+          status: "Active",
+          rooms: 2,
+          occupied: 1,
+          vacant: 1,
+          evacuees: 1,
+          capacity: 5
         }
       ]
     };
